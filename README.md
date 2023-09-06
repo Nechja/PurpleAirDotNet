@@ -4,7 +4,7 @@ A quick wrapper for the Purple Air API
 This repository contains a C# wrapper for the [PurpleAir API](https://api.purpleair.com/), designed to make it easier to access PurpleAir's air quality monitoring data within your C# applications.
 
 
-##How to use
+## How to use
 ```csharp
 PurpleAir purpleAir = new PurpleAir("YOUR_ACCESS_TOKEN_HERE");
 
