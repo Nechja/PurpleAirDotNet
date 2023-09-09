@@ -4,17 +4,26 @@ using PurpleAirDotNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PurpleAirDotNet.Services;
-public class PurpleAir
+public partial class PurpleAir
 {
 	private string accessToken;
 	private readonly string server = "https://api.purpleair.com/";
+	private readonly IHttpClient httpClient;
+	private readonly IJsonSerializer jsonSerializer;
 
-	public PurpleAir(string accessToken) { this.accessToken = accessToken;}
-
+	public PurpleAir(string accessToken, IHttpClient httpClient, IJsonSerializer jsonSerializer)
+	{
+		this.accessToken = accessToken;
+		this.httpClient = httpClient;
+		this.jsonSerializer = jsonSerializer;
+		httpClient.AddDefaultRequestHeader("X-API-Key", accessToken);
+	}
 
 
 	/// <summary>
@@ -32,15 +41,10 @@ public class PurpleAir
 	/// </example>
 	public async Task<ApiResponse> GetSensorAsync(string sensorId)
 	{
-		using (var client = new HttpClient())
-		{
-			client.DefaultRequestHeaders.Add("X-API-Key", accessToken);
-			var response = await client.GetAsync(@$"{server}v1/sensors/{sensorId}");
+			var response = await httpClient.GetAsync(@$"{server}v1/sensors/{sensorId}");
 			response.EnsureSuccessStatusCode();
 			var apiresponce = JsonConvert.DeserializeObject<ApiResponse>(await response.Content.ReadAsStringAsync());
 			return apiresponce;
-			
-		}
 	}
 
 	/// <summary>
@@ -59,15 +63,18 @@ public class PurpleAir
 	{
 		string argString = string.Join(",", args.Select(arg => arg.ToString()));
 
-		using (var client = new HttpClient())
-		{
-			client.DefaultRequestHeaders.Add("X-API-Key", accessToken);
-			var response = await client.GetAsync(@$"{server}v1/sensors/{sensorId}?{argString}");
-			response.EnsureSuccessStatusCode();
-			var apiresponce = JsonConvert.DeserializeObject<ApiResponse>(await response.Content.ReadAsStringAsync());
-			return apiresponce;
+		var response = await httpClient.GetAsync(@$"{server}v1/sensors/{sensorId}?{argString}");
+		response.EnsureSuccessStatusCode();
+		var apiresponce = JsonConvert.DeserializeObject<ApiResponse>(await response.Content.ReadAsStringAsync());
+		return apiresponce;
 
-		}
+
 
 	}
+
+
+
+
+
+
 }
