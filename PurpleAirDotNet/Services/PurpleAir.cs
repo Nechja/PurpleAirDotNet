@@ -68,8 +68,6 @@ public partial class PurpleAir
 		var apiresponce = JsonConvert.DeserializeObject<ApiResponse>(await response.Content.ReadAsStringAsync());
 		return apiresponce;
 
-
-
 	}
 
 
